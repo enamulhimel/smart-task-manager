@@ -101,7 +101,7 @@ export default function TaskItem({
       
       {task.subtasks && task.subtasks.length > 0 && (
         <div className="mt-3 pl-4 border-l-2 border-gray-200">
-          <h4 className="text-sm font-medium mb-2">Subtasks:</h4>
+          <h4 className="text-sm font-medium mb-2">Action Steps:</h4>
           <ul className="list-disc list-inside space-y-1">
             {task.subtasks.map((subtask, index) => (
               <li key={index} className="text-sm text-gray-700">
@@ -115,9 +115,19 @@ export default function TaskItem({
       <button
         onClick={handleSuggestSubtasks}
         disabled={isLoading}
-        className={`mt-3 text-sm ${isLoading ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-600'} text-white px-3 py-1 rounded`}
+        className={`mt-3 text-sm ${isLoading ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white px-3 py-1 rounded flex items-center`}
       >
-        {isLoading ? 'Generating...' : 'Suggest Subtasks'}
+        {isLoading ? (
+    <>
+      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Generating...
+    </>
+  ) : (
+    'Suggest Action Steps'
+  )}
       </button>
     </div>
   );
