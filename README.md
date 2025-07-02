@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+# Smart Task Manager with AI Assistance
+
+A task management application with AI-powered subtask suggestions using Google Gemini API.
+
+## Features
+
+- Add, edit, and delete tasks
+- Task fields: Title, description, status, due date
+- AI-powered subtask suggestions
+- Responsive design for mobile and desktop
+
+## Technologies Used
+
+- Next.js 15 (App Router)
+- TypeScript
+- Tailwind CSS
+- Google Gemini API
+- React Hot Toast for notifications
+
+## Setup Instructions
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
