@@ -1,27 +1,27 @@
-// import { TaskProvider } from '@/context/TaskContext';
-// import type { Metadata } from 'next';
-// import { Inter } from 'next/font/google';
-// import './globals.css';
+import { TaskProvider } from '@/context/TaskContext';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-// const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'] });
 
-// export const metadata: Metadata = {
-//   title: 'Smart Task Manager',
-//   description: 'AI-powered task management',
-// };
+export const metadata: Metadata = {
+  title: 'Smart Task Manager',
+  description: 'AI-powered task management',
+};
 
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//     <html lang="en">
-//       <body className={inter.className}>
-//         <TaskProvider>
-//           {children}
-//         </TaskProvider>
-//       </body>
-//     </html>
-//   );
-// }
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <TaskProvider>
+          {children}
+        </TaskProvider>
+      </body>
+    </html>
+  );
+}
