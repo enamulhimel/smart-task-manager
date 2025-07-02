@@ -37,14 +37,17 @@ export default function TaskItem({
           description: task.description,
         }),
       });
+
+      const data = await response.json();
       
-      if (!response.ok) throw new Error('response.statusText');
+      if (!response.ok) {
+      throw new Error(data.error || `API request failed with status ${response.status}`);
+    }
       
-      const { subtasks } = await response.json();
-      if (!subtasks || subtasks.length === 0) {
-        throw new Error('No subtasks were generated');
-      }
-      onAddSubtasks(task.id, subtasks);
+      if (!data.subtasks || data.subtasks.length === 0) {
+      throw new Error('No subtasks were generated');
+    }
+      onAddSubtasks(task.id, data.subtasks);
       toast.success('Subtasks generated successfully!', { id: 'subtasks' });
     } catch (error) {
       console.error('Error generating subtasks:', error);
@@ -132,3 +135,8 @@ export default function TaskItem({
     </div>
   );
 }
+
+
+
+
+

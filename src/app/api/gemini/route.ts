@@ -1,45 +1,60 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: Request) {
-  const { title, description } = await request.json();
+  if (!process.env.GEMINI_API_KEY) {
+  console.error("❌ GEMINI_API_KEY is missing in environment.");
+  return NextResponse.json({ error: 'Server config error: missing API key' }, { status: 500 });
+}
 
   try {
+    const { title, description } = await request.json();
+    if (!title) {
+      return NextResponse.json(
+        { error: 'Task title is required' },
+        { status: 400 }
+      );
+    }
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     
     const prompt = `Break down the following task into 3-5 smaller, actionable steps. 
     Return only the steps as a bulleted list with no additional text or explanations.
     
     Task: ${title}
-    ${description ? `Description: ${description}` : ''}
+    ${description ? `Description: ${description}` : ''}`
     
-    Example output format:
-    - Step 1
-    - Step 2
-    - Step 3`;
-
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
-    // Extract bullet points and clean them up
     const subtasks = text.split('\n')
-      .filter(line => line.trim().startsWith('-'))
-      .map(line => line.replace(/^- /, '').trim())
-      .filter(Boolean); // Remove empty items
+      .map(line => line.trim())
+      .filter(line => line.startsWith('-') || line.startsWith('•') || line.match(/^\d+\./))
+      .map(line => line
+        .replace(/^[-•]\s*/, '')  
+        .replace(/^\d+\.\s*/, '')
+        .trim()
+      )
+      .filter(Boolean);
 
     if (subtasks.length === 0) {
-      throw new Error('No subtasks were generated');
+      return NextResponse.json(
+        { error: 'No actionable steps could be extracted from the response' },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ subtasks });
   } catch (error) {
-    console.error('Error generating subtasks:', error);
+    console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate subtasks. Please try again.' },
+      { error: 'Failed to generate subtasks. Please try again.',details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
+
+
+
