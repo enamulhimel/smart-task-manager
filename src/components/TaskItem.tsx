@@ -20,7 +20,12 @@ export default function TaskItem({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSuggestSubtasks = async () => {
+    if (!task.title.trim()) {
+      toast.error('Task title is required to generate subtasks');
+      return;
+    }
     setIsLoading(true);
+    toast.loading('Generating subtasks...', { id: 'subtasks' });
     try {
       const response = await fetch('/api/gemini', {
         method: 'POST',
@@ -33,14 +38,17 @@ export default function TaskItem({
         }),
       });
       
-      if (!response.ok) throw new Error('Failed to get suggestions');
+      if (!response.ok) throw new Error('response.statusText');
       
       const { subtasks } = await response.json();
+      if (!subtasks || subtasks.length === 0) {
+        throw new Error('No subtasks were generated');
+      }
       onAddSubtasks(task.id, subtasks);
-      toast.success('Subtasks generated!');
+      toast.success('Subtasks generated successfully!', { id: 'subtasks' });
     } catch (error) {
-      toast.error('Failed to generate subtasks');
-      console.error(error);
+      console.error('Error generating subtasks:', error);
+      toast.error('Failed to generate subtasks. Please try again.', { id: 'subtasks' });
     } finally {
       setIsLoading(false);
     }
