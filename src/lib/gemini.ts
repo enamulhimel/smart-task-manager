@@ -38,4 +38,4 @@ export async function generateSubtasks(taskTitle: string, taskDescription: strin
 }
 
 
-  //gemma-3-1b-it
+  //model:gemma-3-1b-it
