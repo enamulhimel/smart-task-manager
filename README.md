@@ -24,3 +24,7 @@ A task management application with AI-powered subtask suggestions using Google G
 2. Install dependencies:
    ```bash
    pnpm install
+
+## vercel deployment
+
+   live link:https://smart-task-manager-f5vz.vercel.app/
