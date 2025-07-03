@@ -17,12 +17,12 @@ export async function POST(request: Request) {
     const subtasks = await generateSubtasks(title, description);
     return NextResponse.json({ subtasks });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to generate subtasks',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );
