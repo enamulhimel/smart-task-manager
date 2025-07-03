@@ -19,43 +19,39 @@ export default function TaskItem({
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSuggestSubtasks = async () => {
-    if (!task.title.trim()) {
-      toast.error('Task title is required to generate subtasks');
-      return;
-    }
-    setIsLoading(true);
-    toast.loading('Generating subtasks...', { id: 'subtasks' });
-    try {
-      const response = await fetch('/api/gemini', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: task.title,
-          description: task.description,
-        }),
-      });
+const handleSuggestSubtasks = async () => {
+  setIsLoading(true);
+  toast.loading('Generating subtasks...', { id: 'subtasks' });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-      throw new Error(data.error || `API request failed with status ${response.status}`);
+  try {
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: task.title,
+        description: task.description || ''
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate subtasks');
     }
-      
-      if (!data.subtasks || data.subtasks.length === 0) {
-      throw new Error('No subtasks were generated');
-    }
-      onAddSubtasks(task.id, data.subtasks);
-      toast.success('Subtasks generated successfully!', { id: 'subtasks' });
-    } catch (error) {
-      console.error('Error generating subtasks:', error);
-      toast.error('Failed to generate subtasks. Please try again.', { id: 'subtasks' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+    onAddSubtasks(task.id, data.subtasks);
+    toast.success('Subtasks generated!', { id: 'subtasks' });
+    
+  } catch (error) {
+    console.error('Error:', error);
+    toast.error(
+      error instanceof Error ? error.message : 'Failed to generate subtasks',
+      { id: 'subtasks' }
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (isEditing) {
     return (
@@ -104,7 +100,7 @@ export default function TaskItem({
       
       {task.subtasks && task.subtasks.length > 0 && (
         <div className="mt-3 pl-4 border-l-2 border-gray-200">
-          <h4 className="text-sm font-medium mb-2">Action Steps:</h4>
+          <h4 className="text-sm font-medium mb-2">Subtasks:</h4>
           <ul className="list-disc list-inside space-y-1">
             {task.subtasks.map((subtask, index) => (
               <li key={index} className="text-sm text-gray-700">
@@ -118,25 +114,10 @@ export default function TaskItem({
       <button
         onClick={handleSuggestSubtasks}
         disabled={isLoading}
-        className={`mt-3 text-sm ${isLoading ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white px-3 py-1 rounded flex items-center`}
+        className={`mt-3 text-sm ${isLoading ? 'bg-gray-300' : 'bg-green-500 hover:bg-green-600'} text-white px-3 py-1 rounded`}
       >
-        {isLoading ? (
-    <>
-      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Generating...
-    </>
-  ) : (
-    'Suggest Action Steps'
-  )}
+        {isLoading ? 'Generating...' : 'Suggest Subtasks'}
       </button>
     </div>
   );
 }
-
-
-
-
-

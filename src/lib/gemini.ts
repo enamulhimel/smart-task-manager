@@ -1,55 +1,41 @@
-// import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
-// export async function generateSubtasks(taskTitle: string, taskDescription: string) {
-//   const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-  
-//   const prompt = `Break down the following task into 3-5 smaller, actionable steps. 
-//   Return only the steps as a bulleted list with no additional text.
-  
-//   Task: ${taskTitle}
-//   Description: ${taskDescription}
-  
-//   Example output format:
-//   - Step 1
-//   - Step 2
-//   - Step 3`;
+export async function generateSubtasks(taskTitle: string, taskDescription: string) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemma-3-1b-it" });
+    
+    const prompt = `Break down the following task into 3-5 smaller, actionable steps. 
+    Return only the steps as a bulleted list with no additional text or explanations.
+    
+    Task: ${taskTitle}
+    ${taskDescription ? `Description: ${taskDescription}` : ''}
+    
+    Example output format:
+    - Book venue
+    - Send invitations
+    - Order cake`;
 
-//   try {
-//     const result = await model.generateContent(prompt);
-//     const response = await result.response;
-//     const text = response.text();
-//     return text.split('\n').filter(step => step.trim().startsWith('-')).map(step => step.replace(/^- /, '').trim());
-//   } catch (error) {
-//     console.error('Error generating subtasks:', error);
-//     throw error;
-//   }
-// }
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    const subtasks = text.split('\n')
+      .filter(line => line.trim().startsWith('-') || line.trim().startsWith('•'))
+      .map(line => line.replace(/^[-•]\s*/, '').trim())
+      .filter(Boolean);
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+    if (subtasks.length === 0) {
+      throw new Error('No subtasks were generated');
+    }
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-
-export async function getSubtasksFromGemini(taskTitle: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-  const prompt = `
-  Break down the following task into 3-5 actionable subtasks:
-
-  Task: ${taskTitle}
-
-  Return the subtasks as a simple bullet list.
-  `;
-
-  const result = await model.generateContent(prompt);
-  const text = await result.response.text();
-
-  // Parse subtasks from bullet points
-  const subtasks = text
-    .split("\n")
-    .filter(line => line.trim())
-    .map(line => line.replace(/^[-*•]\s*/, "").trim());
-
-  return subtasks;
+    return subtasks;
+  } catch (error) {
+    console.error('Error generating subtasks:', error);
+    throw error;
+  }
 }
+
+
+  //gemma-3-1b-it

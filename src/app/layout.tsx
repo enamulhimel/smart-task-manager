@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: 'Smart Task Manager',
   description: 'AI-powered task management',
 };
+
 export default function RootLayout({
   children,
 }: {
